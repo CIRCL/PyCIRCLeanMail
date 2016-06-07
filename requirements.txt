@@ -1,0 +1,5 @@
+twiggy
+python-magic
+olefile
+git+https://github.com/Rafiot/officedissector.git
+git+https://github.com/Rafiot/pdfid.git
