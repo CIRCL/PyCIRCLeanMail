@@ -86,7 +86,6 @@ class File(FileBaseMem):
     def __init__(self, file_obj, orig_filename):
         ''' Init file object, set the mimetype '''
         super(File, self).__init__(file_obj, orig_filename)
-
         self.is_recursive = False
         if not self.has_mimetype():
             # No mimetype, should not happen.
@@ -110,7 +109,8 @@ class File(FileBaseMem):
         if propertype.get(self.extension) is not None:
             expected_mimetype = propertype.get(self.extension)
         else:
-            expected_mimetype, encoding = mimetypes.guess_type(self.orig_filename, strict=False)
+            # mimetypes.guess_type is *SUPER* basic and kindof unreliable (.eml.xz => mail)
+            expected_mimetype = mimetypes.types_map.get(self.extension)
             if aliases.get(expected_mimetype) is not None:
                 expected_mimetype = aliases.get(expected_mimetype)
 
@@ -217,7 +217,9 @@ class KittenGroomerMail(KittenGroomerMailBase):
         '''Way to process message file'''
         self.cur_attachment.log_string += 'Message file'
         self.recursive += 1
-        self.cur_attachment = self.process_mail(self.cur_attachment)
+        fn = self.cur_attachment.orig_filename
+        sub_message = self.process_mail(self.cur_attachment.file_obj.getvalue())
+        self.cur_attachment = File(sub_message.as_bytes(), fn)
         self.recursive -= 1
 
     # ##### Converted ######
@@ -382,11 +384,15 @@ class KittenGroomerMail(KittenGroomerMailBase):
 
     def _tar(self):
         '''Tar processor'''
-        archive = tarfile.open(mode='r:*', fileobj=self.cur_attachment.file_obj)
+        archive = tarfile.open(mode='r', fileobj=self.cur_attachment.file_obj)
         loc_attach = []
         for subfile in archive.getmembers():
+            f = archive.extractfile(subfile)
+            if f is None:
+                # Directory
+                continue
             try:
-                cur_file = File(archive.extractfile(subfile).read(), subfile.name)
+                cur_file = File(f.read(), subfile.name)
                 self.process_payload(cur_file)
                 loc_attach.append(self.cur_attachment)
             except Exception:
@@ -406,7 +412,7 @@ class KittenGroomerMail(KittenGroomerMailBase):
         self.is_archive = True
         # It is highly plausible that lzma, gzip and bzip are in fact also tarfiles
         # Trying that first...
-        if 'lzma' in self.cur_attachment.mimetype:
+        if 'xz' in self.cur_attachment.mimetype:
             try:
                 self.cur_attachment = self._tar()
             except:
@@ -528,9 +534,6 @@ class KittenGroomerMail(KittenGroomerMailBase):
     def process_mail(self, raw_email=None):
         if raw_email is None:
             raw_email = self.raw_email
-
-        if self.recursive > 0:
-            self._print_log()
 
         if self.recursive >= self.max_recursive:
             self.cur_attachment.make_dangerous()

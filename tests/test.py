@@ -4,6 +4,7 @@
 import unittest
 import os
 import sys
+from io import BytesIO
 
 from kittengroomer_email import KittenGroomerMail
 
@@ -19,11 +20,15 @@ class TestBasic(unittest.TestCase):
 
     def test_basic(self):
         src = os.path.join(self.curpath, 'tests/mail_src')
+        dst = os.path.join(self.curpath, 'tests/mail_dst')
+        if not os.path.exists(dst):
+            os.makedirs(dst)
         for path, subdirs, files in os.walk(src):
             for name in files:
-                with open(os.path.join(path, name), 'rb') as f:
-                    try:
-                        t = KittenGroomerMail(f.read(), debug=True)
-                        t.process_mail()
-                    except:
-                        print("Failed on ", name)
+                full_path = os.path.join(path, name)
+                with open(full_path, 'rb') as f:
+                    t = KittenGroomerMail(f.read(), debug=True)
+                    m = t.process_mail()
+                    content = BytesIO(m.as_bytes())
+                    with open(full_path.replace(src, dst), 'wb') as z:
+                        z.write(content.getvalue())
