@@ -26,4 +26,4 @@ notifications:
 
 after_success:
     - coveralls
-    - codecov
+    - bash <(curl -s https://codecov.io/bash)
