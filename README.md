@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/CIRCL/PyCIRCLeanMail.svg?branch=master)](https://travis-ci.org/CIRCL/PyCIRCLeanMail)
-[![codecov.io](https://codecov.io/github/CIRCL/PyCIRCLeanMail/coverage.svg?branch=master)](https://codecov.io/github/CIRCL/PyCIRCLeanMail?branch=master)
+[![Build Status](https://travis-ci.org/Rafiot/PyCIRCLeanMail.svg?branch=master)](https://travis-ci.org/Rafiot/PyCIRCLeanMail)
+[![codecov.io](https://codecov.io/github/Rafiot/PyCIRCLeanMail/coverage.svg?branch=master)](https://codecov.io/github/Rafiot/PyCIRCLeanMail?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/Rafiot/PyCIRCLeanMail/badge.svg?branch=master)](https://coveralls.io/github/Rafiot/PyCIRCLeanMail?branch=master)
 
 # PyCIRCLeanMail
