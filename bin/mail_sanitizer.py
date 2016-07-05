@@ -20,7 +20,7 @@ def process_dir(path_in, path_out):
         if not os.path.exists(os.path.dirname(outfile)):
             os.makedirs(os.path.dirname(outfile))
         with open(outfile, 'wb') as out:
-            out.write(parsed_email.as_string())
+            out.write(parsed_email.as_bytes())
 
 
 if __name__ == '__main__':
